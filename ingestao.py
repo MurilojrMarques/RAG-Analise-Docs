@@ -8,6 +8,7 @@ from langchain_community.vectorstores import Chroma
 load_dotenv()
 
 def preparar_banco_vetorial(caminho_pdf, diretorio_db="./chroma_db"):
+    load_dotenv()
     loader = PyPDFLoader(caminho_pdf)
     documentos = loader.load()
     
