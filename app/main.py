@@ -1,31 +1,13 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import FastAPI
+from app.api.rag_router import router as rag_router
 
-from app.core.config import logger
-from app.services.rag_service import rag_chain_instance
+app = FastAPI(
+    title="Agente RAG - Análise de Documentos", 
+    version="1.0",
+    description="API para análise de documentos"
+)
 
-class PerguntaRequest(BaseModel):
-    pergunta: str = Field(..., min_length=3, description="A pergunta a ser feita baseada no documento.")
-
-app = FastAPI(title="Agente RAG - Análise de Documentos", version="2.0")
-
-@app.post("/perguntar")
-async def fazer_pergunta(request: PerguntaRequest):
-    logger.info(f"Processando pergunta: '{request.pergunta}'")
-    try:
-        resposta = rag_chain_instance.invoke(request.pergunta)
-        logger.info("Resposta gerada com sucesso.")
-        
-        return {
-            "pergunta": request.pergunta,
-            "resposta": resposta,
-        }
-    except Exception as e:
-        logger.error("Erro interno ao processar a corrente do RAG", exc_info=True)
-        raise HTTPException(
-            status_code=500, 
-            detail="Ocorreu um erro ao processar a sua solicitação junto à Inteligência Artificial."
-        )
+app.include_router(rag_router)
 
 if __name__ == "__main__":
     import uvicorn
